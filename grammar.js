@@ -222,7 +222,7 @@ module.exports = grammar({
       '(',
       ')',
       '{',
-      alias(/[^}]+/, $.shell_content),
+      alias(/(?:({[^}]*})|[^}])*/, $.shell_content),
       '}',
     ),
 
