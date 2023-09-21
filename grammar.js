@@ -236,7 +236,7 @@ module.exports = grammar({
       seq(
         '"',
         repeat(choice(
-          alias(token.immediate(prec(1, /([^"$\\]|\\?\r?\n)+/)), $.string_content),
+          alias(token.immediate(prec(1, /([^"$\\]|\\.?|\\?\r?\n)+/)), $.string_content),
           $.variable_expansion,
           $.inline_python,
           '$BB_ENV_PASSTHROUGH',
