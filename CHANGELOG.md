@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.2](https://github.com/amaanq/tree-sitter-bitbake/compare/v1.0.1...v1.0.2) (2023-11-08)
+
+
+### Bug Fixes
+
+* **ci:** bump actions ([e85e14c](https://github.com/amaanq/tree-sitter-bitbake/commit/e85e14cc3161e442681676568fddd0627ae41a38))
+* properly handle inherit paths ([edcdb7d](https://github.com/amaanq/tree-sitter-bitbake/commit/edcdb7dffd0e1680c60d489a625ab119e0d273a0))
+* variable_expansions can be empty ([5166f0d](https://github.com/amaanq/tree-sitter-bitbake/commit/5166f0d6cfc4ff6300f67b48c264edc570832d6e))
+
 ## [1.0.1](https://github.com/amaanq/tree-sitter-bitbake/compare/v1.0.0...v1.0.1) (2023-09-21)
 
 
