@@ -1753,7 +1753,7 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
+          "type": "inherit_path",
           "named": true
         },
         {
@@ -3545,6 +3545,10 @@
   {
     "type": "inherit",
     "named": false
+  },
+  {
+    "type": "inherit_path",
+    "named": true
   },
   {
     "type": "integer",

@@ -135,8 +135,13 @@ module.exports = grammar({
 
     inherit_directive: $ => seq(
       'inherit',
-      repeat1(choice($.identifier, $.variable_expansion, $.inline_python)),
+      repeat1(choice(
+        $.variable_expansion,
+        $.inline_python,
+        $.inherit_path,
+      )),
     ),
+    inherit_path: _ => /[^$ \r\n][^ \r\n]+/,
 
     inherit_configuration_directive: $ => seq(
       'INHERIT',

@@ -300,20 +300,24 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "identifier"
-              },
-              {
-                "type": "SYMBOL",
                 "name": "variable_expansion"
               },
               {
                 "type": "SYMBOL",
                 "name": "inline_python"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "inherit_path"
               }
             ]
           }
         }
       ]
+    },
+    "inherit_path": {
+      "type": "PATTERN",
+      "value": "[^$ \\r\\n][^ \\r\\n]+"
     },
     "inherit_configuration_directive": {
       "type": "SEQ",
