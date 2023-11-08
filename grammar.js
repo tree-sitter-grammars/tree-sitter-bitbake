@@ -264,7 +264,7 @@ module.exports = grammar({
 
     inline_python: $ => seq('${@', $.expression, '}'),
 
-    variable_expansion: $ => seq('${', $.identifier, '}'),
+    variable_expansion: $ => seq('${', optional($.identifier), '}'),
 
     identifier: _ => /[a-zA-Z0-9_-]+/,
 
