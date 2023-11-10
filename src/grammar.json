@@ -681,13 +681,20 @@
           "value": "{"
         },
         {
-          "type": "ALIAS",
+          "type": "REPEAT",
           "content": {
-            "type": "PATTERN",
-            "value": "(?:({[^}]*})|[^}])*"
-          },
-          "named": true,
-          "value": "shell_content"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "shell_content"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "inline_python"
+              }
+            ]
+          }
         },
         {
           "type": "STRING",
@@ -6133,6 +6140,10 @@
     {
       "type": "STRING",
       "value": "}"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "shell_content"
     }
   ],
   "inline": [

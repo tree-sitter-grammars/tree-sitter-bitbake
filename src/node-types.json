@@ -1511,6 +1511,10 @@
           "named": true
         },
         {
+          "type": "inline_python",
+          "named": true
+        },
+        {
           "type": "override",
           "named": true
         },

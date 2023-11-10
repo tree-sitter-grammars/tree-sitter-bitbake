@@ -1,8 +1,10 @@
+#include "tree_sitter/parser.h"
+
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <tree_sitter/parser.h>
+#include <wctype.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -50,6 +52,8 @@ enum TokenType {
     CLOSE_PAREN,
     CLOSE_BRACKET,
     CLOSE_BRACE,
+
+    SHELL_CONTENT,
 };
 
 typedef enum {
@@ -441,6 +445,61 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
         if (has_flags) {
             return false;
         }
+    }
+
+    if (valid_symbols[SHELL_CONTENT] && !error_recovery_mode) {
+        while (iswspace(lexer->lookahead)) {
+            skip(lexer);
+            if (lexer->lookahead == '\n') {
+                skip(lexer);
+                break;
+            }
+        }
+
+        bool advance_once = false;
+
+        bool brace_depth = 0;
+
+        while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
+            switch (lexer->lookahead) {
+                case '$':
+                    lexer->mark_end(lexer);
+                    advance(lexer);
+                    if (lexer->lookahead == '{') {
+                        advance(lexer);
+                        brace_depth++;
+                        if (lexer->lookahead == '@') {
+                            advance(lexer);
+                            lexer->result_symbol = SHELL_CONTENT;
+                            return advance_once;
+                        }
+                    }
+                    lexer->mark_end(lexer);
+                    advance_once = true;
+                    break;
+                case '{':
+                    advance(lexer);
+                    brace_depth++;
+                    break;
+                case '}':
+                    advance(lexer);
+                    brace_depth--;
+                case '\r':
+                case '\t':
+                case '\f':
+                case '\v':
+                case ' ':
+                    advance(lexer);
+                    break;
+                default:
+                    advance(lexer);
+                    advance_once = true;
+                    break;
+            }
+        }
+        lexer->mark_end(lexer);
+        lexer->result_symbol = SHELL_CONTENT;
+        return advance_once && brace_depth == 0;
     }
 
     return false;

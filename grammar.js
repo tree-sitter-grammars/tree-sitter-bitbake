@@ -47,6 +47,8 @@ module.exports = grammar({
     ']',
     ')',
     '}',
+
+    $.shell_content,
   ],
 
   extras: $ => [
@@ -227,7 +229,10 @@ module.exports = grammar({
       '(',
       ')',
       '{',
-      alias(/(?:({[^}]*})|[^}])*/, $.shell_content),
+      repeat(choice(
+        $.shell_content,
+        $.inline_python,
+      )),
       '}',
     ),
 
