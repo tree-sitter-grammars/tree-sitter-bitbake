@@ -1,46 +1,47 @@
 #include "tree_sitter/parser.h"
 
 #include <assert.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <wctype.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-#define VEC_RESIZE(vec, _cap)                                                  \
-    void *tmp = realloc((vec).data, (_cap) * sizeof((vec).data[0]));           \
-    assert(tmp != NULL);                                                       \
-    (vec).data = tmp;                                                          \
+#define VEC_RESIZE(vec, _cap)                                                                                          \
+    void *tmp = realloc((vec).data, (_cap) * sizeof((vec).data[0]));                                                   \
+    assert(tmp != NULL);                                                                                               \
+    (vec).data = tmp;                                                                                                  \
     (vec).cap = (_cap);
 
-#define VEC_GROW(vec, _cap)                                                    \
-    if ((vec).cap < (_cap)) {                                                  \
-        VEC_RESIZE((vec), (_cap));                                             \
+#define VEC_GROW(vec, _cap)                                                                                            \
+    if ((vec).cap < (_cap)) {                                                                                          \
+        VEC_RESIZE((vec), (_cap));                                                                                     \
     }
 
-#define VEC_PUSH(vec, el)                                                      \
-    if ((vec).cap == (vec).len) {                                              \
-        VEC_RESIZE((vec), MAX(16, (vec).len * 2));                             \
-    }                                                                          \
+#define VEC_PUSH(vec, el)                                                                                              \
+    if ((vec).cap == (vec).len) {                                                                                      \
+        VEC_RESIZE((vec), MAX(16, (vec).len * 2));                                                                     \
+    }                                                                                                                  \
     (vec).data[(vec).len++] = (el);
 
 #define VEC_POP(vec) (vec).len--;
 
-#define VEC_NEW                                                                \
+#define VEC_NEW                                                                                                        \
     { .len = 0, .cap = 0, .data = NULL }
 
 #define VEC_BACK(vec) ((vec).data[(vec).len - 1])
 
-#define VEC_FREE(vec)                                                          \
-    {                                                                          \
-        if ((vec).data != NULL)                                                \
-            free((vec).data);                                                  \
+#define VEC_FREE(vec)                                                                                                  \
+    {                                                                                                                  \
+        if ((vec).data != NULL)                                                                                        \
+            free((vec).data);                                                                                          \
     }
 
 #define VEC_CLEAR(vec) (vec).len = 0;
 
 enum TokenType {
+    CONCAT,
+
     NEWLINE,
     INDENT,
     DEDENT,
@@ -72,21 +73,13 @@ typedef struct {
 
 static inline Delimiter new_delimiter() { return (Delimiter){0}; }
 
-static inline bool is_format(Delimiter *delimiter) {
-    return delimiter->flags & Format;
-}
+static inline bool is_format(Delimiter *delimiter) { return delimiter->flags & Format; }
 
-static inline bool is_raw(Delimiter *delimiter) {
-    return delimiter->flags & Raw;
-}
+static inline bool is_raw(Delimiter *delimiter) { return delimiter->flags & Raw; }
 
-static inline bool is_triple(Delimiter *delimiter) {
-    return delimiter->flags & Triple;
-}
+static inline bool is_triple(Delimiter *delimiter) { return delimiter->flags & Triple; }
 
-static inline bool is_bytes(Delimiter *delimiter) {
-    return delimiter->flags & Bytes;
-}
+static inline bool is_bytes(Delimiter *delimiter) { return delimiter->flags & Bytes; }
 
 static inline int32_t end_character(Delimiter *delimiter) {
     if (delimiter->flags & SingleQuote) {
@@ -101,19 +94,13 @@ static inline int32_t end_character(Delimiter *delimiter) {
     return 0;
 }
 
-static inline void set_format(Delimiter *delimiter) {
-    delimiter->flags |= Format;
-}
+static inline void set_format(Delimiter *delimiter) { delimiter->flags |= Format; }
 
 static inline void set_raw(Delimiter *delimiter) { delimiter->flags |= Raw; }
 
-static inline void set_triple(Delimiter *delimiter) {
-    delimiter->flags |= Triple;
-}
+static inline void set_triple(Delimiter *delimiter) { delimiter->flags |= Triple; }
 
-static inline void set_bytes(Delimiter *delimiter) {
-    delimiter->flags |= Bytes;
-}
+static inline void set_bytes(Delimiter *delimiter) { delimiter->flags |= Bytes; }
 
 static inline void set_end_character(Delimiter *delimiter, int32_t character) {
     switch (character) {
@@ -167,28 +154,42 @@ static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 
-bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
-                                               const bool *valid_symbols) {
+// #define advance(lexer)                                                                                                 \
+//     {                                                                                                                  \
+//         printf("advance %c, line: %d\n", lexer->lookahead, __LINE__);                                                  \
+//         (lexer->advance)(lexer, false);                                                                                \
+//     }
+//
+// #define skip(lexer) \
+//     { \
+//         printf("skip %c, line: %d\n", lexer->lookahead, __LINE__); \
+//         (lexer->advance)(lexer, true); \
+//     }
+
+bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     Scanner *scanner = (Scanner *)payload;
 
-    bool error_recovery_mode =
-        valid_symbols[STRING_CONTENT] && valid_symbols[INDENT];
-    bool within_brackets = valid_symbols[CLOSE_BRACE] ||
-                           valid_symbols[CLOSE_PAREN] ||
-                           valid_symbols[CLOSE_BRACKET];
+    bool error_recovery_mode = valid_symbols[STRING_CONTENT] && valid_symbols[INDENT];
+    bool within_brackets = valid_symbols[CLOSE_BRACE] || valid_symbols[CLOSE_PAREN] || valid_symbols[CLOSE_BRACKET];
+
+    if (valid_symbols[CONCAT] && !error_recovery_mode) {
+        if (!(lexer->lookahead == 0 || iswspace(lexer->lookahead) || lexer->lookahead == '(' ||
+              lexer->lookahead == ':' || lexer->lookahead == '[' || lexer->lookahead == '=')) {
+            lexer->result_symbol = CONCAT;
+            return true;
+        }
+    }
 
     bool advanced_once = false;
     if (valid_symbols[ESCAPE_INTERPOLATION] && scanner->delimiters.len > 0 &&
-        (lexer->lookahead == '{' || lexer->lookahead == '}') &&
-        !error_recovery_mode) {
+        (lexer->lookahead == '{' || lexer->lookahead == '}') && !error_recovery_mode) {
         Delimiter delimiter = VEC_BACK(scanner->delimiters);
         if (is_format(&delimiter)) {
             lexer->mark_end(lexer);
             bool is_left_brace = lexer->lookahead == '{';
             advance(lexer);
             advanced_once = true;
-            if ((lexer->lookahead == '{' && is_left_brace) ||
-                (lexer->lookahead == '}' && !is_left_brace)) {
+            if ((lexer->lookahead == '{' && is_left_brace) || (lexer->lookahead == '}' && !is_left_brace)) {
                 advance(lexer);
                 lexer->mark_end(lexer);
                 lexer->result_symbol = ESCAPE_INTERPOLATION;
@@ -198,15 +199,12 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
         }
     }
 
-    if (valid_symbols[STRING_CONTENT] && scanner->delimiters.len > 0 &&
-        !error_recovery_mode) {
+    if (valid_symbols[STRING_CONTENT] && scanner->delimiters.len > 0 && !error_recovery_mode) {
         Delimiter delimiter = VEC_BACK(scanner->delimiters);
         int32_t end_char = end_character(&delimiter);
         bool has_content = advanced_once;
         while (lexer->lookahead) {
-            if ((advanced_once || lexer->lookahead == '{' ||
-                 lexer->lookahead == '}') &&
-                is_format(&delimiter)) {
+            if ((advanced_once || lexer->lookahead == '{' || lexer->lookahead == '}') && is_format(&delimiter)) {
                 lexer->mark_end(lexer);
                 lexer->result_symbol = STRING_CONTENT;
                 return has_content;
@@ -216,8 +214,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
                     // Step over the backslash.
                     advance(lexer);
                     // Step over any escaped quotes.
-                    if (lexer->lookahead == end_character(&delimiter) ||
-                        lexer->lookahead == '\\') {
+                    if (lexer->lookahead == end_character(&delimiter) || lexer->lookahead == '\\') {
                         advance(lexer);
                     }
                     // Step over newlines
@@ -234,8 +231,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
                 if (is_bytes(&delimiter)) {
                     lexer->mark_end(lexer);
                     advance(lexer);
-                    if (lexer->lookahead == 'N' || lexer->lookahead == 'u' ||
-                        lexer->lookahead == 'U') {
+                    if (lexer->lookahead == 'N' || lexer->lookahead == 'u' || lexer->lookahead == 'U') {
                         // In bytes string, \N{...}, \uXXXX and \UXXXXXXXX are
                         // not escape sequences
                         // https://docs.bitbake.org/3/reference/lexical_analysis.html#string-and-bytes-literals
@@ -286,8 +282,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
                 lexer->mark_end(lexer);
                 return true;
 
-            } else if (lexer->lookahead == '\n' && has_content &&
-                       !is_triple(&delimiter)) {
+            } else if (lexer->lookahead == '\n' && has_content && !is_triple(&delimiter)) {
                 return false;
             }
             advance(lexer);
@@ -331,7 +326,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
             }
             skip(lexer);
             indent_length = 0;
-        } else if (lexer->lookahead == '\\') {
+        } else if (lexer->lookahead == '\\' && valid_symbols[STRING_CONTENT]) {
             skip(lexer);
             if (lexer->lookahead == '\r') {
                 skip(lexer);
@@ -354,23 +349,19 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
         if (scanner->indents.len > 0) {
             uint16_t current_indent_length = VEC_BACK(scanner->indents);
 
-            if (valid_symbols[INDENT] &&
-                indent_length > current_indent_length) {
+            if (valid_symbols[INDENT] && indent_length > current_indent_length) {
                 VEC_PUSH(scanner->indents, indent_length);
                 lexer->result_symbol = INDENT;
                 return true;
             }
 
-            bool next_tok_is_string_start = lexer->lookahead == '\"' ||
-                                            lexer->lookahead == '\'' ||
-                                            lexer->lookahead == '`';
+            bool next_tok_is_string_start =
+                lexer->lookahead == '\"' || lexer->lookahead == '\'' || lexer->lookahead == '`';
 
             if ((valid_symbols[DEDENT] ||
-                 (!valid_symbols[NEWLINE] &&
-                  !(valid_symbols[STRING_START] && next_tok_is_string_start) &&
+                 (!valid_symbols[NEWLINE] && !(valid_symbols[STRING_START] && next_tok_is_string_start) &&
                   !within_brackets)) &&
-                indent_length < current_indent_length &&
-                !scanner->inside_f_string &&
+                indent_length < current_indent_length && !scanner->inside_f_string &&
 
                 // Wait to create a dedent token until we've consumed any
                 // comments
@@ -458,7 +449,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
 
         bool advance_once = false;
 
-        bool brace_depth = 0;
+        uint8_t brace_depth = 0;
 
         while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
             switch (lexer->lookahead) {
@@ -474,7 +465,6 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
                             return advance_once;
                         }
                     }
-                    lexer->mark_end(lexer);
                     advance_once = true;
                     break;
                 case '{':
@@ -484,6 +474,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
                 case '}':
                     advance(lexer);
                     brace_depth--;
+                    break;
                 case '\r':
                 case '\t':
                 case '\f':
@@ -505,8 +496,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer,
     return false;
 }
 
-unsigned tree_sitter_bitbake_external_scanner_serialize(void *payload,
-                                                        char *buffer) {
+unsigned tree_sitter_bitbake_external_scanner_serialize(void *payload, char *buffer) {
     Scanner *scanner = (Scanner *)payload;
 
     size_t size = 0;
@@ -525,18 +515,14 @@ unsigned tree_sitter_bitbake_external_scanner_serialize(void *payload,
     size += delimiter_count;
 
     int iter = 1;
-    for (; iter < scanner->indents.len &&
-           size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
-         ++iter) {
+    for (; iter < scanner->indents.len && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++iter) {
         buffer[size++] = (char)scanner->indents.data[iter];
     }
 
     return size;
 }
 
-void tree_sitter_bitbake_external_scanner_deserialize(void *payload,
-                                                      const char *buffer,
-                                                      unsigned length) {
+void tree_sitter_bitbake_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
     Scanner *scanner = (Scanner *)payload;
 
     VEC_CLEAR(scanner->delimiters);

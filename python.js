@@ -255,7 +255,7 @@ module.exports.pythonCode = {
     $.while_statement,
     $.try_statement,
     $.with_statement,
-    $.function_definition,
+    $.python_function_definition,
   ),
 
   if_statement: $ => seq(

@@ -8,11 +8,11 @@
         "named": true
       },
       {
-        "type": "function_definition",
+        "type": "if_statement",
         "named": true
       },
       {
-        "type": "if_statement",
+        "type": "python_function_definition",
         "named": true
       },
       {
@@ -940,6 +940,25 @@
       "types": [
         {
           "type": "python_string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "concatenation",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "variable_expansion",
           "named": true
         }
       ]
@@ -2132,7 +2151,19 @@
       "required": false,
       "types": [
         {
+          "type": "concatenation",
+          "named": true
+        },
+        {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "variable_expansion",
+          "named": true
+        },
+        {
+          "type": "variable_flag",
           "named": true
         }
       ]
@@ -2989,6 +3020,10 @@
       "required": true,
       "types": [
         {
+          "type": "concatenation",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },
@@ -3492,6 +3527,10 @@
   },
   {
     "type": "export",
+    "named": false
+  },
+  {
+    "type": "fakeroot",
     "named": false
   },
   {

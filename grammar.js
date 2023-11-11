@@ -23,10 +23,11 @@ module.exports = grammar({
     [$.with_item, $._collection_elements],
     [$.named_expression, $.as_pattern],
     [$.print_statement, $.primary_expression],
-    [$.function_definition, $.primary_expression],
   ],
 
   externals: $ => [
+    $._concat,
+
     $._newline,
     $._indent,
     $._dedent,
@@ -63,6 +64,8 @@ module.exports = grammar({
     $._expressions,
     $._left_hand_side,
     $.keyword_identifier,
+
+    $._dotted_identifier,
   ],
 
   supertypes: $ => [
@@ -96,7 +99,7 @@ module.exports = grammar({
     )),
 
     variable_assignment: $ => seq(
-      $.identifier,
+      choice($.identifier, $.concatenation),
       optional(choice(
         $.variable_flag,
         $.variable_expansion,
@@ -119,14 +122,24 @@ module.exports = grammar({
     variable_flag: $ => seq(
       '[',
       choice(
-        alias($.identifier, $.flag),
         'noexec',
+        alias(/[^ \r\n\]]+/, $.flag),
       ),
       ']',
     ),
     override: $ => seq(
       ':',
-      sep1(choice('append', 'prepend', 'remove', $.identifier), ':'),
+      sep1(
+        choice(
+          'append',
+          'prepend',
+          'remove',
+          seq($.identifier, optional($.variable_flag)),
+          $.variable_expansion,
+          $.concatenation,
+        ),
+        ':',
+      ),
     ),
 
     unset_statement: $ => seq(
@@ -188,14 +201,18 @@ module.exports = grammar({
         seq(
           'after',
           repeat1($.identifier),
-          'before',
-          repeat1($.identifier),
+          optional(seq(
+            'before',
+            repeat1($.identifier),
+          )),
         ),
         seq(
           'before',
           repeat1($.identifier),
-          'after',
-          repeat1($.identifier),
+          optional(seq(
+            'after',
+            repeat1($.identifier),
+          )),
         ),
       )),
     ),
@@ -211,6 +228,7 @@ module.exports = grammar({
     ),
 
     anonymous_python_function: $ => seq(
+      optional('fakeroot'),
       'python',
       optional(seq(
         $.identifier,
@@ -224,6 +242,7 @@ module.exports = grammar({
     ),
 
     function_definition: $ => seq(
+      optional('fakeroot'),
       $.identifier,
       optional($.override),
       '(',
@@ -247,10 +266,12 @@ module.exports = grammar({
         '"',
         repeat(choice(
           alias(token.immediate(prec(1, /([^"$\\]|\\.?|\\?\r?\n)+/)), $.string_content),
+          /"[^"$\\\s]+"/,
           $.variable_expansion,
           $.inline_python,
           '$BB_ENV_PASSTHROUGH',
           '$BB_ENV_PASSTHROUGH_ADDITIONS',
+          alias(token(prec(-1, '$')), $.string_content),
         )),
         '"',
       ),
@@ -258,6 +279,7 @@ module.exports = grammar({
         '\'',
         repeat(choice(
           alias(token.immediate(prec(1, /([^'$\\]|\\?\r?\n)+/)), $.string_content),
+          token(prec(-1, /"[^"$\\\s]+"/)),
           $.variable_expansion,
           $.inline_python,
           '$BB_ENV_PASSTHROUGH',
@@ -271,10 +293,20 @@ module.exports = grammar({
 
     variable_expansion: $ => seq('${', optional($.identifier), '}'),
 
+    ...pythonCode,
+
+    concatenation: $ => prec(-1, seq(
+      choice($.identifier, $.variable_expansion, $._dotted_identifier),
+      repeat1(seq(
+        $._concat,
+        choice($.identifier, $.variable_expansion, $._dotted_identifier),
+      )),
+      optional($._concat),
+    )),
+
     identifier: _ => /[a-zA-Z0-9_-]+/,
+    _dotted_identifier: $ => alias(/[.a-zA-Z0-9_-]+/, $.identifier),
 
     comment: _ => token(seq('#', /.*/)),
-
-    ...pythonCode,
   },
 });
