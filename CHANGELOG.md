@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/amaanq/tree-sitter-bitbake/compare/v1.0.2...v1.1.0) (2023-11-11)
+
+
+### Features
+
+* misc improvements and bug fixes ([bae410b](https://github.com/amaanq/tree-sitter-bitbake/commit/bae410bae601180aaa4fcf02d1c8dbfc1e28f1eb))
+
+
+### Bug Fixes
+
+* parse shell content better ([73bd0f8](https://github.com/amaanq/tree-sitter-bitbake/commit/73bd0f89c63572e4a63d380e3ac4e725b8e5c2ce))
+
 ## [1.0.2](https://github.com/amaanq/tree-sitter-bitbake/compare/v1.0.1...v1.0.2) (2023-11-08)
 
 
