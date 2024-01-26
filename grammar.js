@@ -168,12 +168,18 @@ module.exports = grammar({
 
     include_directive: $ => seq(
       'include',
-      alias(/[^ \r\n]+/, $.include_path),
+      alias(repeat1(choice(
+        token(prec(-1, /[^"$\{\}\s]+/)),
+        $.variable_expansion,
+      )), $.include_path),
     ),
 
     require_directive: $ => seq(
       'require',
-      alias(/[^ \r\n]+/, $.include_path),
+      alias(repeat1(choice(
+        token(prec(-1, /[^"$\{\}\s]+/)),
+        $.variable_expansion,
+      )), $.include_path),
     ),
 
     export_statement: $ => seq(

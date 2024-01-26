@@ -1768,6 +1768,21 @@
     }
   },
   {
+    "type": "include_path",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "variable_expansion",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "inherit_directive",
     "named": true,
     "fields": {},
@@ -3580,10 +3595,6 @@
   {
     "type": "include",
     "named": false
-  },
-  {
-    "type": "include_path",
-    "named": true
   },
   {
     "type": "inherit",

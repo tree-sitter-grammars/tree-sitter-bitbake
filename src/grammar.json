@@ -434,8 +434,27 @@
         {
           "type": "ALIAS",
           "content": {
-            "type": "PATTERN",
-            "value": "[^ \\r\\n]+"
+            "type": "REPEAT1",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": -1,
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "[^\"$\\{\\}\\s]+"
+                    }
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "variable_expansion"
+                }
+              ]
+            }
           },
           "named": true,
           "value": "include_path"
@@ -452,8 +471,27 @@
         {
           "type": "ALIAS",
           "content": {
-            "type": "PATTERN",
-            "value": "[^ \\r\\n]+"
+            "type": "REPEAT1",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": -1,
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "[^\"$\\{\\}\\s]+"
+                    }
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "variable_expansion"
+                }
+              ]
+            }
           },
           "named": true,
           "value": "include_path"
