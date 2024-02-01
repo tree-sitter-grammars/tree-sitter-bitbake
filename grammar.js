@@ -258,6 +258,7 @@ module.exports = grammar({
       repeat(choice(
         $.shell_content,
         $.inline_python,
+        $.function_definition,
       )),
       '}',
     ),
