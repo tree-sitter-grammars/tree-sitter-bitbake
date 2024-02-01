@@ -959,6 +959,9 @@ module.exports.pythonCode = {
   none: _ => 'None',
 
   python_identifier: _ => /[_\p{XID_Start}][_\p{XID_Continue}]*/,
+
+  line_continuation: _ => token(seq('\\', choice(seq(optional('\r'), '\n'), '\0'))),
+
   positional_separator: _ => '/',
   keyword_separator: _ => '*',
 };

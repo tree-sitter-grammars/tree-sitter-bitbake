@@ -55,6 +55,7 @@ module.exports = grammar({
   extras: $ => [
     /\s/,
     $.comment,
+    $.line_continuation,
   ],
 
   inline: $ => [
