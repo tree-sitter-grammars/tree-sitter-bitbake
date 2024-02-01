@@ -473,9 +473,9 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
                         brace_depth++;
                         if (lexer->lookahead == '@') {
                             advance(lexer);
-                            lexer->result_symbol = SHELL_CONTENT;
-                            return advance_once;
                         }
+                        lexer->result_symbol = SHELL_CONTENT;
+                        return advance_once;
                     }
                     advance_once = true;
                     break;
