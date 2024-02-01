@@ -839,6 +839,10 @@
               {
                 "type": "SYMBOL",
                 "name": "inline_python"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "function_definition"
               }
             ]
           }
@@ -6200,6 +6204,48 @@
       "type": "PATTERN",
       "value": "[_\\p{XID_Start}][_\\p{XID_Continue}]*"
     },
+    "line_continuation": {
+      "type": "TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "\\"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "\r"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "STRING",
+                    "value": "\n"
+                  }
+                ]
+              },
+              {
+                "type": "STRING",
+                "value": "\u0000"
+              }
+            ]
+          }
+        ]
+      }
+    },
     "positional_separator": {
       "type": "STRING",
       "value": "/"
@@ -6313,6 +6359,10 @@
     {
       "type": "SYMBOL",
       "name": "comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "line_continuation"
     }
   ],
   "conflicts": [

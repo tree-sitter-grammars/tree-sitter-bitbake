@@ -1526,6 +1526,10 @@
       "required": true,
       "types": [
         {
+          "type": "function_definition",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },
@@ -3619,6 +3623,10 @@
   {
     "type": "lambda",
     "named": false
+  },
+  {
+    "type": "line_continuation",
+    "named": true
   },
   {
     "type": "noexec",
