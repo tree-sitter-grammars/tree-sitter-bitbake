@@ -450,9 +450,21 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
         bool advance_once = false;
 
         uint8_t brace_depth = 0;
+        char start_quote = 0;
 
         while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
             switch (lexer->lookahead) {
+                case '\'':
+                case '"':
+                    if (!start_quote) {
+                        start_quote = lexer->lookahead;
+                    } else if (lexer->lookahead == start_quote) {
+                        start_quote = 0;
+                    }
+                    advance(lexer);
+                    advance_once = true;
+                    break;
+
                 case '$':
                     lexer->mark_end(lexer);
                     advance(lexer);
@@ -469,11 +481,15 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
                     break;
                 case '{':
                     advance(lexer);
-                    brace_depth++;
+                    if (!start_quote) {
+                        brace_depth++;
+                    }
                     break;
                 case '}':
                     advance(lexer);
-                    brace_depth--;
+                    if (!start_quote) {
+                        brace_depth--;
+                    }
                     break;
                 case '\r':
                 case '\t':
