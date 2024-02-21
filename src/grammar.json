@@ -23,6 +23,10 @@
               },
               {
                 "type": "SYMBOL",
+                "name": "inherit_defer_directive"
+              },
+              {
+                "type": "SYMBOL",
                 "name": "include_directive"
               },
               {
@@ -351,6 +355,35 @@
         {
           "type": "STRING",
           "value": "inherit"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "variable_expansion"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "inline_python"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "inherit_path"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "inherit_defer_directive": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "inherit_defer"
         },
         {
           "type": "REPEAT1",
