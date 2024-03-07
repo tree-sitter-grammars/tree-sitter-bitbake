@@ -1544,6 +1544,10 @@
         {
           "type": "shell_content",
           "named": true
+        },
+        {
+          "type": "variable_expansion",
+          "named": true
         }
       ]
     }

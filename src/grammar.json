@@ -871,6 +871,10 @@
               },
               {
                 "type": "SYMBOL",
+                "name": "variable_expansion"
+              },
+              {
+                "type": "SYMBOL",
                 "name": "inline_python"
               },
               {
