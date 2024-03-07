@@ -309,7 +309,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
         } else if (lexer->lookahead == '\t') {
             indent_length += 8;
             skip(lexer);
-        } else if (lexer->lookahead == '#') {
+        } else if (lexer->lookahead == '#' && !valid_symbols[SHELL_CONTENT]) {
             // If we haven't found an EOL yet,
             // then this is a comment after an expression:
             //   foo = bar # comment
@@ -473,9 +473,9 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
                         brace_depth++;
                         if (lexer->lookahead == '@') {
                             advance(lexer);
-                            lexer->result_symbol = SHELL_CONTENT;
-                            return advance_once;
                         }
+                        lexer->result_symbol = SHELL_CONTENT;
+                        return advance_once;
                     }
                     advance_once = true;
                     break;

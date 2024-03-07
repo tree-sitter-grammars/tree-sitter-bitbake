@@ -1544,6 +1544,10 @@
         {
           "type": "shell_content",
           "named": true
+        },
+        {
+          "type": "variable_expansion",
+          "named": true
         }
       ]
     }
@@ -1779,6 +1783,29 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "variable_expansion",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "inherit_defer_directive",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "inherit_path",
+          "named": true
+        },
+        {
+          "type": "inline_python",
+          "named": true
+        },
         {
           "type": "variable_expansion",
           "named": true
@@ -2482,6 +2509,10 @@
         },
         {
           "type": "include_directive",
+          "named": true
+        },
+        {
+          "type": "inherit_defer_directive",
           "named": true
         },
         {
@@ -3602,6 +3633,10 @@
   },
   {
     "type": "inherit",
+    "named": false
+  },
+  {
+    "type": "inherit_defer",
     "named": false
   },
   {
