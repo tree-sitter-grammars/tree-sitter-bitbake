@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/tree-sitter-grammars/tree-sitter-bitbake/compare/v1.1.0...v1.2.0) (2024-04-27)
+
+
+### Features
+
+* parse variable expansion in include path ([01ead54](https://github.com/tree-sitter-grammars/tree-sitter-bitbake/commit/01ead542b1e6f52cc9a2c9c1c95e079702122161))
+* support function definitions inside function definitions ([c8471c2](https://github.com/tree-sitter-grammars/tree-sitter-bitbake/commit/c8471c2e1df4e30a8564ea9bbea9f396d9608118))
+* support python's line continuations ([9e06540](https://github.com/tree-sitter-grammars/tree-sitter-bitbake/commit/9e06540e5b9fda6386f771da907cbea616a11a43))
+
+
+### Bug Fixes
+
+* braces in shell strings ([fe6d3d9](https://github.com/tree-sitter-grammars/tree-sitter-bitbake/commit/fe6d3d975cc7af8d64c5a32d6d1b6cb323ccc2cb))
+
 ## [1.1.0](https://github.com/amaanq/tree-sitter-bitbake/compare/v1.0.2...v1.1.0) (2023-11-11)
 
 
