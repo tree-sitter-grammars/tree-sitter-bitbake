@@ -150,7 +150,7 @@ module.exports = grammar({
     ),
 
     inherit_directive: $ => seq(
-      'inherit',
+      choice('inherit', 'inherit_defer'),
       repeat1(choice(
         $.variable_expansion,
         $.inline_python,

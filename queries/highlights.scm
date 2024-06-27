@@ -2,6 +2,7 @@
 
 [
   "inherit"
+  "inherit_defer"
   "include"
   "require"
   "export"

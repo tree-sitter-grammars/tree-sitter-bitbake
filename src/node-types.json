@@ -3605,6 +3605,10 @@
     "named": false
   },
   {
+    "type": "inherit_defer",
+    "named": false
+  },
+  {
     "type": "inherit_path",
     "named": true
   },
