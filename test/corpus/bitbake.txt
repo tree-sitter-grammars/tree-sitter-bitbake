@@ -1,0 +1,26 @@
+==================
+Empty variable expansion
+==================
+
+BAR = "${}"
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (literal
+      (string
+        (variable_expansion)))))
+
+==================
+Inherit_defer
+==================
+
+inherit_defer foo
+
+---
+
+(recipe
+  (inherit_defer_directive
+    (inherit_path)))

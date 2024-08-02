@@ -1,0 +1,43 @@
+==================
+Fakeroot
+==================
+
+fakeroot python() {
+  pass
+}
+
+---
+
+(recipe
+  (anonymous_python_function
+    (block
+      (pass_statement))))
+
+==================
+Line continuation with backslash
+==================
+
+def example():
+    print('test', \
+        True
+    )
+
+---
+
+(recipe
+  (python_function_definition
+    (python_identifier)
+    (parameters)
+    (block
+      (expression_statement
+        (call
+          (python_identifier)
+          (argument_list
+            (python_string
+              (string_start)
+              (string_content)
+              (string_end))
+            (line_continuation)
+            (true)))))))
+
+

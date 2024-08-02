@@ -1,0 +1,218 @@
+==================
+Basic
+==================
+
+foo () {
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)))
+
+==================
+Simple Variable expansion
+==================
+
+foo () {
+    echo $bar
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Simple Variable expansion in string
+==================
+
+foo () {
+    echo "$bar"
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Variable expansion
+==================
+
+foo () {
+    echo ${bar}
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Variable expansion in string
+==================
+
+foo () {
+    echo "${bar}"
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Nested variable expansion
+==================
+
+foo () {
+    echo ${bar ${bar}}
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Nested variable expansion in string
+==================
+
+foo () {
+    echo "${bar ${bar}}"
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Inline Python
+==================
+
+foo () {
+    if ${@test}; then
+    fi
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)
+    (inline_python
+      (python_identifier))
+    (shell_content)
+    (shell_content)))
+
+=================
+Inline Python in string
+==================
+
+foo () {
+    echo "${@test}"
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)
+    (inline_python
+      (python_identifier))
+    (shell_content)))
+
+==================
+Nested Shell function
+==================
+
+foo () {
+    bar () {
+    }
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (function_definition
+      (identifier))))
+
+==================
+Single opening bracket in string
+==================
+
+foo () {
+  '{'
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Single closing bracket in string
+==================
+
+foo () {
+  "}"
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
+==================
+Single bracket in comment
+==================
+
+foo () {
+  # {
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (comment)))
+
+==================
+Number sign (#) in string
+==================
+
+foo () {
+  '${}#'
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))
+
