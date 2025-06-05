@@ -81,6 +81,7 @@ module.exports = grammar({
         $.variable_assignment,
         $.unset_statement,
         $.inherit_directive,
+        $.inherit_configuration_directive,
         $.include_directive,
         $.require_directive,
         $.export_statement,
