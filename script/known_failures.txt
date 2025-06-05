@@ -1,2 +1,0 @@
-examples/bitbake/lib/bb/tests/runqueue-tests/recipes/fails-mc/fails-mc1.bb
-examples/bitbake/lib/bb/tests/runqueue-tests/recipes/fails-mc/fails-mc2.bb
