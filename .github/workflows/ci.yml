@@ -2,33 +2,64 @@ name: CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+    paths:
+      - grammar.js
+      - python.js
+      - src/**
+      - test/**
+      - examples/**
+      - bindings/**
+      - binding.gyp
   pull_request:
-    branches:
-      - "**"
+    paths:
+      - grammar.js
+      - python.js
+      - src/**
+      - test/**
+      - examples/**
+      - bindings/**
+      - binding.gyp
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    name: Test parser
+    runs-on: ${{matrix.os}}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up tree-sitter
+        uses: tree-sitter/setup-action/cli@v2
+      - name: Run parser and binding tests
+        uses: tree-sitter/parser-test-action@v2
         with:
-          node-version: 18
-      - run: npm install
-      - run: npm test
-
-  test_windows:
-    runs-on: windows-2019
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+          generate: false
+          test-rust: true
+      - name: Clone BitBake repository
+        uses: actions/checkout@v4
         with:
-          node-version: 18
-      - run: npm install
-      - run: npm run-script test-windows
+          path: examples/bitbake
+          repository: openembedded/bitbake
+          sparse-checkout: lib/bb/tests
+      - name: Parse sample files
+        uses: tree-sitter/parse-action@v4
+        id: parse-files
+        with:
+          files: |-
+            examples/**/**.bb
+            examples/**/**.bbclass
+            !examples/bitbake/lib/bb/tests/runqueue-tests/classes/image.bbclass
+      - name: Upload failures artifact
+        uses: actions/upload-artifact@v4
+        if: "!cancelled() && steps.parse-files.outcome == 'failure'"
+        with:
+          name: failures-${{runner.os}}
+          path: ${{steps.parse-files.outputs.failures}}

@@ -2,47 +2,53 @@
   "name": "tree-sitter-bitbake",
   "version": "1.1.0",
   "description": "BitBake grammar for tree-sitter",
+  "repository": "https://github.com/tree-sitter-grammars/tree-sitter-bitbake",
+  "license": "MIT",
+  "author": {
+    "name": "Amaan Qureshi",
+    "email": "amaanq12@gmail.com"
+  },
   "main": "bindings/node",
+  "types": "bindings/node",
   "keywords": [
-    "parsing",
     "incremental",
+    "parsing",
+    "tree-sitter",
     "bitbake"
   ],
-  "author": "Amaan Qureshi <amaanq12@gmail.com>",
-  "license": "MIT",
+  "files": [
+    "grammar.js",
+    "tree-sitter.json",
+    "binding.gyp",
+    "prebuilds/**",
+    "bindings/node/*",
+    "queries/*",
+    "src/**",
+    "*.wasm"
+  ],
   "dependencies": {
-    "nan": "^2.17.0"
+    "node-addon-api": "^8.3.1",
+    "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
-    "eslint": "^8.47.0",
-    "eslint-config-google": "^0.14.0",
-    "tree-sitter-cli": "^0.20.8"
+    "eslint": "^9.28.0",
+    "eslint-config-treesitter": "^1.0.2",
+    "prebuildify": "^6.0.1",
+    "tree-sitter-cli": "^0.25.6"
+  },
+  "peerDependencies": {
+    "tree-sitter": "^0.22.4"
+  },
+  "peerDependenciesMeta": {
+    "tree-sitter": {
+      "optional": true
+    }
   },
   "scripts": {
-    "build": "tree-sitter generate && node-gyp build",
-    "lint": "eslint grammar.js",
-    "parse": "tree-sitter parse",
-    "test": "tree-sitter test && script/parse-examples",
-    "test-windows": "tree-sitter test"
-  },
-  "repository": "https://github.com/amaanq/tree-sitter-bitbake",
-  "tree-sitter": [
-    {
-      "scope": "source.bitbake",
-      "file-types": [
-        "bb",
-        "bbclass"
-      ],
-      "injection-regex": "^(bb|bbclass)$",
-      "highlights": [
-        "queries/highlights.scm"
-      ],
-      "injections": [
-        "queries/injections.scm"
-      ],
-      "locals": [
-        "queries/locals.scm"
-      ]
-    }
-  ]
+    "install": "node-gyp-build",
+    "lint": "eslint grammar.js python.js",
+    "prestart": "tree-sitter build --wasm",
+    "start": "tree-sitter playground",
+    "test": "node --test bindings/node/*_test.js"
+  }
 }

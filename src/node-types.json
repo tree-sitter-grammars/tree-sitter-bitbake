@@ -1787,6 +1787,21 @@
     }
   },
   {
+    "type": "inherit_configuration_directive",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "inherit_directive",
     "named": true,
     "fields": {},
@@ -2447,6 +2462,7 @@
   {
     "type": "recipe",
     "named": true,
+    "root": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -2482,6 +2498,10 @@
         },
         {
           "type": "include_directive",
+          "named": true
+        },
+        {
+          "type": "inherit_configuration_directive",
           "named": true
         },
         {
@@ -3433,6 +3453,10 @@
     "named": false
   },
   {
+    "type": "\\",
+    "named": false
+  },
+  {
     "type": "]",
     "named": false
   },
@@ -3494,7 +3518,8 @@
   },
   {
     "type": "comment",
-    "named": true
+    "named": true,
+    "extra": true
   },
   {
     "type": "continue",
@@ -3626,7 +3651,8 @@
   },
   {
     "type": "line_continuation",
-    "named": true
+    "named": true,
+    "extra": true
   },
   {
     "type": "noexec",

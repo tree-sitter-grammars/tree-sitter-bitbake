@@ -4,9 +4,6 @@
  * @license MIT
  */
 
-/* eslint-disable arrow-parens */
-/* eslint-disable camelcase */
-/* eslint-disable-next-line spaced-comment */
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
@@ -84,6 +81,7 @@ module.exports = grammar({
         $.variable_assignment,
         $.unset_statement,
         $.inherit_directive,
+        $.inherit_configuration_directive,
         $.include_directive,
         $.require_directive,
         $.export_statement,
