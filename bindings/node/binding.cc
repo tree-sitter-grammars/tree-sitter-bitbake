@@ -1,30 +1,23 @@
-#include "nan.h"
-#include "tree_sitter/parser.h"
-#include <node.h>
+#include <napi.h>
 
-using namespace v8;
+typedef struct TSLanguage TSLanguage;
 
 extern "C" TSLanguage *tree_sitter_bitbake();
 
-namespace {
+// "tree-sitter", "language" hashed with BLAKE2
+const napi_type_tag LANGUAGE_TYPE_TAG = {
+    0x8AF2E5212AD58ABF, 0xD5006CAD83ABBA16
+};
 
-NAN_METHOD(New) {}
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    auto language =
+        Napi::External<TSLanguage>::New(env, tree_sitter_bitbake());
 
-void Init(Local<Object> exports, Local<Object> module) {
-    Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
-    tpl->SetClassName(Nan::New("Language").ToLocalChecked());
-    tpl->InstanceTemplate()->SetInternalFieldCount(1);
+    language.TypeTag(&LANGUAGE_TYPE_TAG);
 
-    Local<Function> constructor = Nan::GetFunction(tpl).ToLocalChecked();
-    Local<Object> instance =
-        constructor->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
-    Nan::SetInternalFieldPointer(instance, 0, tree_sitter_bitbake());
+    exports["language"] = language;
 
-    Nan::Set(instance, Nan::New("name").ToLocalChecked(),
-             Nan::New("bitbake").ToLocalChecked());
-    Nan::Set(module, Nan::New("exports").ToLocalChecked(), instance);
+    return exports;
 }
 
-NODE_MODULE(tree_sitter_bitbake_binding, Init)
-
-} // namespace
+NODE_API_MODULE(tree_sitter_bitbake_binding, Init)

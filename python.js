@@ -34,7 +34,7 @@ const PREC = {
   call: 22,
 };
 
-module.exports.pythonCode = {
+export const pythonCode = {
   python_function_definition: $ => seq(
     'def',
     field('name', $.python_identifier),
@@ -992,5 +992,4 @@ function sep1(rule, separator) {
   return seq(rule, repeat(seq(separator, rule)));
 }
 
-module.exports.commaSep1 = commaSep1;
-module.exports.sep1 = sep1;
+export {commaSep1, sep1};

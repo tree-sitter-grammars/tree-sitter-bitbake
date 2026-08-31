@@ -1,0 +1,14 @@
+==================
+Variable expansion in string
+==================
+
+foo () {
+    echo "${bar}"
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)))

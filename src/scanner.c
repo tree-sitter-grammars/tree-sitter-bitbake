@@ -154,17 +154,6 @@ static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 
-// #define advance(lexer)                                                                                                 \
-//     {                                                                                                                  \
-//         printf("advance %c, line: %d\n", lexer->lookahead, __LINE__);                                                  \
-//         (lexer->advance)(lexer, false);                                                                                \
-//     }
-//
-// #define skip(lexer) \
-//     { \
-//         printf("skip %c, line: %d\n", lexer->lookahead, __LINE__); \
-//         (lexer->advance)(lexer, true); \
-//     }
 
 bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     Scanner *scanner = (Scanner *)payload;
@@ -450,6 +439,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
         bool advance_once = false;
 
         uint8_t brace_depth = 0;
+        uint8_t variable_expansion_depth = 0;
         char start_quote = 0;
 
         while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
@@ -471,6 +461,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
                     if (lexer->lookahead == '{') {
                         advance(lexer);
                         brace_depth++;
+                        variable_expansion_depth++;
                         if (lexer->lookahead == '@') {
                             advance(lexer);
                             lexer->result_symbol = SHELL_CONTENT;
@@ -487,9 +478,13 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
                     break;
                 case '}':
                     advance(lexer);
-                    if (!start_quote) {
+                    if (variable_expansion_depth) {
+                        brace_depth--;
+                        variable_expansion_depth--;
+                    } else if (!start_quote) {
                         brace_depth--;
                     }
+
                     break;
                 case '\r':
                 case '\t':
@@ -506,7 +501,7 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
         }
         lexer->mark_end(lexer);
         lexer->result_symbol = SHELL_CONTENT;
-        return advance_once && brace_depth == 0;
+        return advance_once && brace_depth == 0 && variable_expansion_depth == 0;
     }
 
     return false;
@@ -530,7 +525,7 @@ unsigned tree_sitter_bitbake_external_scanner_serialize(void *payload, char *buf
     }
     size += delimiter_count;
 
-    int iter = 1;
+    uint32_t iter = 1;
     for (; iter < scanner->indents.len && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++iter) {
         buffer[size++] = (char)scanner->indents.data[iter];
     }
