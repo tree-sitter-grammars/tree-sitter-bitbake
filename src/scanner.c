@@ -154,17 +154,6 @@ static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 
-// #define advance(lexer)                                                                                                 \
-//     {                                                                                                                  \
-//         printf("advance %c, line: %d\n", lexer->lookahead, __LINE__);                                                  \
-//         (lexer->advance)(lexer, false);                                                                                \
-//     }
-//
-// #define skip(lexer) \
-//     { \
-//         printf("skip %c, line: %d\n", lexer->lookahead, __LINE__); \
-//         (lexer->advance)(lexer, true); \
-//     }
 
 bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     Scanner *scanner = (Scanner *)payload;
@@ -536,7 +525,7 @@ unsigned tree_sitter_bitbake_external_scanner_serialize(void *payload, char *buf
     }
     size += delimiter_count;
 
-    int iter = 1;
+    uint32_t iter = 1;
     for (; iter < scanner->indents.len && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++iter) {
         buffer[size++] = (char)scanner->indents.data[iter];
     }
