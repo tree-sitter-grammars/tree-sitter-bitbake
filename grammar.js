@@ -10,9 +10,9 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-const {pythonCode, sep1} = require('./python');
+import {pythonCode, sep1} from './python.js';
 
-module.exports = grammar({
+export default grammar({
   name: 'bitbake',
 
   conflicts: $ => [
